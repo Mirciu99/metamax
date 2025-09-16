@@ -25,7 +25,16 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
     try {
       await signIn(email, password)
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      console.error('Login error:', error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+
+      if (errorMessage.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please check your credentials.')
+      } else if (errorMessage.includes('fetch') || errorMessage.includes('Invalid value')) {
+        setError('Connection error. Please try again.')
+      } else {
+        setError('Unable to sign in. Please try again.')
+      }
     } finally {
       setLoading(false)
     }

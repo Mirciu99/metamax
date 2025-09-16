@@ -47,16 +47,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, name?: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
+    try {
+      // Try normal Supabase signup first
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
         },
-      },
-    })
-    if (error) throw error
+      })
+
+      if (error) {
+        throw error
+      }
+
+    } catch (error: unknown) {
+      console.error('Primary signup failed, trying API route:', error)
+
+      // If normal signup fails, try our API route as fallback
+      try {
+        const response = await fetch('/api/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password, name }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'API signup failed')
+        }
+
+        console.log('API signup successful')
+        return
+
+      } catch (apiError) {
+        console.error('API signup also failed:', apiError)
+        // Throw original error
+        throw error
+      }
+    }
   }
 
   const signOut = async () => {
