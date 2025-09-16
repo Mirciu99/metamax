@@ -24,8 +24,8 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
 
     try {
       await signIn(email, password)
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -72,7 +72,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
               onClick={onToggleMode}
               className="text-blue-600 hover:underline text-sm"
             >
-              Don't have an account? Sign up
+              Don&apos;t have an account? Sign up
             </button>
           </div>
         </form>

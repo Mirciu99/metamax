@@ -27,8 +27,8 @@ export function SignupForm({ onToggleMode }: SignupFormProps) {
     try {
       await signUp(email, password, name)
       setSuccess(true)
-    } catch (error: any) {
-      setError(error.message)
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
