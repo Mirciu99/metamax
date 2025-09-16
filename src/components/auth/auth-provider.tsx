@@ -47,22 +47,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, name?: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
+    console.log('Starting signup process...', { email, hasPassword: !!password, name })
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
         },
-      },
-    })
+      })
 
-    if (error) {
-      throw error
+      console.log('Signup response:', { data, error })
+
+      if (error) {
+        console.error('Signup error details:', error)
+        throw error
+      }
+
+      console.log('Signup successful!')
+      return data
+
+    } catch (err) {
+      console.error('Signup catch error:', err)
+      throw err
     }
-
-    // For demo purposes, we'll treat any signup as successful
-    // In production, you'd configure Supabase to disable email confirmation
   }
 
   const signOut = async () => {

@@ -4,8 +4,17 @@ import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const createSupabaseClient = () =>
-  createBrowserClient(supabaseUrl, supabaseAnonKey)
+console.log('Supabase config:', {
+  url: supabaseUrl,
+  hasAnonKey: !!supabaseAnonKey,
+  anonKeyLength: supabaseAnonKey?.length
+})
+
+export const createSupabaseClient = () => {
+  const client = createBrowserClient(supabaseUrl, supabaseAnonKey)
+  console.log('Created Supabase browser client')
+  return client
+}
 
 export const createSupabaseServerClient = (cookieStore: ReadonlyRequestCookies) =>
   createServerClient(supabaseUrl, supabaseAnonKey, {
