@@ -47,33 +47,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, name?: string) => {
-    try {
-      // Use our API route to create user with admin privileges (skip email confirmation)
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
           name,
-        }),
-      })
+        },
+      },
+    })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create account')
-      }
-
-      // Now sign in the user
-      await signIn(email, password)
-
-    } catch (error) {
-      console.error('Signup error:', error)
+    if (error) {
       throw error
     }
+
+    // For demo purposes, we'll treat any signup as successful
+    // In production, you'd configure Supabase to disable email confirmation
   }
 
   const signOut = async () => {
