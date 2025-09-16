@@ -47,17 +47,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, name?: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: undefined,
-        data: {
-          name,
+    try {
+      // Use our API route to create user with admin privileges (skip email confirmation)
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      },
-    })
-    if (error) throw error
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account')
+      }
+
+      // Now sign in the user
+      await signIn(email, password)
+
+    } catch (error) {
+      console.error('Signup error:', error)
+      throw error
+    }
   }
 
   const signOut = async () => {
